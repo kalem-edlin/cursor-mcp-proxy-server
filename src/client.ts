@@ -44,12 +44,19 @@ const createClient = (server: ServerConfig): { client: Client | undefined, trans
     if (server.transport.type === 'sse') {
       transport = new SSEClientTransport(new URL(server.transport.url));
     } else {
+      const scopedEnv = server.transport.env ? server.transport.env.reduce((o, v) => ({
+        ...o,
+        [v]: process.env[v] || ''
+      }), {}) : {}
+      
+
       transport = new StdioClientTransport({
         command: server.transport.command,
         args: server.transport.args,
-        env: server.transport.env ? server.transport.env.reduce((o, v) => ({
-          [v]: process.env[v] || ''
-        }), {}) : undefined
+        env: {
+          PATH: process.env.PATH || '',
+          ...scopedEnv
+        }
       });
     }
   } catch (error) {
