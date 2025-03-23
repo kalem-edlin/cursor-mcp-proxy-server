@@ -29,9 +29,6 @@ const createClient = (server: ServerConfig): { client: Client | undefined, trans
     return { client: undefined, transport: undefined };
   }
 
-<<<<<<< HEAD
-  let transport: Transport | null = null
-=======
   // Check for missing env variables and create a degraded client if any are missing - to inform the MCP user that the potential server is degraded
   if (server.transport.type !== 'sse' && server.transport.env) {
     const missingEnvVars = server.transport.env.filter(v => !process.env[v]);
@@ -43,7 +40,6 @@ const createClient = (server: ServerConfig): { client: Client | undefined, trans
   }
 
   let transport: Transport | null = null;
->>>>>>> update
   try {
     if (server.transport.type === 'sse') {
       transport = new SSEClientTransport(new URL(server.transport.url));
@@ -86,11 +82,7 @@ export const createClients = async (servers: ServerConfig[]): Promise<ConnectedC
     console.log(`Connecting to server: ${server.name}`);
 
     const waitFor = 2500
-<<<<<<< HEAD
-    const retries = 3
-=======
     const retries = process.env.CLIENT_CONNECT_RETRIES ? parseInt(process.env.CLIENT_CONNECT_RETRIES) : 3
->>>>>>> update
     let count = 0
     let retry = true
 
