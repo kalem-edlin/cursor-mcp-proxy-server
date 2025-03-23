@@ -1,8 +1,9 @@
 # MCP Proxy Server - Cursor specific fork
 
-A Model Context Protocol (MCP) proxy server that solves two key limitations in Cursor's MCP implementation:
+A Model Context Protocol (MCP) proxy server that solves three key limitations in Cursor's MCP implementation:
 1. The 40-tool limit per server
 2. Suboptimal environment variable management
+3. Lack of mcp workspace configuration (when different projects require different sets of tools)
 
 This is done with a solution that can:
 
