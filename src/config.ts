@@ -45,16 +45,14 @@ export const loadConfig = async (): Promise<Config> => {
       throw new Error(`CLIENT_CONFIG_DIRECTORY is not a directory: ${absoluteClientPath}`);
     }
     
-    const mcpConfigRelativePath = process.env.MCP_CONFIG_PATH;
-    if (!mcpConfigRelativePath) {
-      throw new Error('MCP_CONFIG_PATH environment variable is not set');
-    }
     
     const envFilePath = join(absoluteClientPath, '.env');
     if (fs.existsSync(envFilePath)) {
       dotenv.config({ path: envFilePath });
     }
     
+    const mcpConfigRelativePath = process.env.MCP_CONFIG_PATH ?? './config.json';
+
     const mcpConfigPath = join(absoluteClientPath, mcpConfigRelativePath);
     
     if (!fs.existsSync(mcpConfigPath)) {

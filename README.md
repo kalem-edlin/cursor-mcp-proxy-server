@@ -111,9 +111,11 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 {
   "mcpServers": {
     "mcp-proxy": {
-      "command": "/path/to/mcp-proxy-server/build/index.js",
+      "command": "npx cursor-mcp-proxy-server",
       "env": {
-        "MCP_CONFIG_PATH": "/absolute/path/to/your/config.json",
+        "CLIENT_CONFIG_DIRECTORY": "/absolute/path/to/your/project/.cursor",
+        "MCP_CONFIG_PATH": "./config.json",
+        "CLIENT_CONNECT_RETRIES": "3",
         "KEEP_SERVER_OPEN": "1"
       }
     }
@@ -128,7 +130,7 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 The following environment variables can be configured:
 
 - `KEEP_SERVER_OPEN`: When set to "1", keeps the SSE server running even if a client disconnects
-- `CLIENT_CONNECT_RETRIES`: Controls the number of retry attempts when connecting to MCP servers (default: 3)
+- `CLIENT_CONNECT_RETRIES`: Controls the number of retry attempts when connecting to MCP servers (default: 1)
 - `CLIENT_CONFIG_DIRECTORY`: Specifies the directory containing configuration files and environment variables
 - `MCP_CONFIG_PATH`: Specifies the path to the MCP config file relative to the `CLIENT_CONFIG_DIRECTORY` (default: `./config.json`)
 

@@ -82,7 +82,7 @@ export const createClients = async (servers: ServerConfig[]): Promise<ConnectedC
     console.log(`Connecting to server: ${server.name}`);
 
     const waitFor = 2500
-    const retries = process.env.CLIENT_CONNECT_RETRIES ? parseInt(process.env.CLIENT_CONNECT_RETRIES) : 3
+    const retries = process.env.CLIENT_CONNECT_RETRIES ? parseInt(process.env.CLIENT_CONNECT_RETRIES) : 1
     let count = 0
     let retry = true
 
