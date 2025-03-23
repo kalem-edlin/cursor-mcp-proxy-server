@@ -24,7 +24,6 @@
     "@modelcontextprotocol/sdk": "0.6.0",
     "@types/cors": "^2.8.17",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
     "eventsource": "^3.0.2",
     "express": "^4.21.1",
     "zod-to-json-schema": "^3.23.5"

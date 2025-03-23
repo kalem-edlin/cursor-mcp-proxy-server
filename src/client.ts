@@ -15,30 +15,19 @@ const createClient = (server: ServerConfig): { client: Client | undefined, trans
 
   let transport: Transport | null = null
   try {
-    if (!server.transport) {
-      throw new Error(`Missing transport configuration for server: ${server.name}`);
-    }
-    
     if (server.transport.type === 'sse') {
       transport = new SSEClientTransport(new URL(server.transport.url));
     } else {
-      const envVars = server.transport.env 
-        ? server.transport.env.reduce((o, v) => ({ ...o, [v]: process.env[v] || '' }), {})
-        : {};
-      
-      const environmentWithPath = {
-        ...envVars,
-        PATH: process.env.PATH || ''
-      };
-      
       transport = new StdioClientTransport({
         command: server.transport.command,
         args: server.transport.args,
-        env: environmentWithPath
+        env: server.transport.env ? server.transport.env.reduce((o, v) => ({
+          [v]: process.env[v] || ''
+        }), {}) : undefined
       });
     }
   } catch (error) {
-    console.error(`Failed to create transport for server ${server.name}:`, error);
+    console.error(`Failed to create transport ${server.transport.type || 'stdio'} to ${server.name}:`, error);
   }
 
   if (!transport) {
@@ -67,7 +56,7 @@ export const createClients = async (servers: ServerConfig[]): Promise<ConnectedC
     console.log(`Connecting to server: ${server.name}`);
 
     const waitFor = 2500
-    const retries = process.env.MCP_CLIENT_RETRIES ? parseInt(process.env.MCP_CLIENT_RETRIES) : 3
+    const retries = 3
     let count = 0
     let retry = true
 
