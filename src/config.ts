@@ -20,6 +20,7 @@ export type TransportConfig = TransportConfigSSE | TransportConfigStdio
 export interface ServerConfig {
   name: string;
   transport: TransportConfig;
+  allowedTools?: string[];
 }
 
 export interface Config {
@@ -45,18 +46,22 @@ export const loadConfig = async (): Promise<Config> => {
       throw new Error(`CLIENT_CONFIG_DIRECTORY is not a directory: ${absoluteClientPath}`);
     }
     
+    const mcpConfigRelativePath = process.env.MCP_CONFIG_PATH;
+    if (!mcpConfigRelativePath) {
+      throw new Error('MCP_CONFIG_PATH environment variable is not set');
+    }
+    
     const envFilePath = join(absoluteClientPath, '.env');
     if (fs.existsSync(envFilePath)) {
       dotenv.config({ path: envFilePath });
     }
     
-    const mcpConfigPath = join(absoluteClientPath, 'mcp', 'config.json');
+    const mcpConfigPath = join(absoluteClientPath, mcpConfigRelativePath);
     
     if (!fs.existsSync(mcpConfigPath)) {
       throw new Error(`Required config file not found at ${mcpConfigPath}`);
     }
     
-    console.log(`Loading MCP config from ${mcpConfigPath}`);
     const fileContents = await readFile(mcpConfigPath, 'utf-8');
     return JSON.parse(fileContents);
     

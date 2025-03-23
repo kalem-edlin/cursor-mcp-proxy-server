@@ -1,26 +1,26 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
+  CompatibilityCallToolResultSchema,
   GetPromptRequestSchema,
+  GetPromptResultSchema,
   ListPromptsRequestSchema,
-  ListResourcesRequestSchema,
-  ListToolsRequestSchema,
-  ReadResourceRequestSchema,
-  Tool,
-  ListToolsResultSchema,
   ListPromptsResultSchema,
+  ListResourcesRequestSchema,
   ListResourcesResultSchema,
-  ReadResourceResultSchema,
   ListResourceTemplatesRequestSchema,
   ListResourceTemplatesResultSchema,
+  ListToolsRequestSchema,
+  ListToolsResultSchema,
+  ReadResourceRequestSchema,
+  ReadResourceResultSchema,
   ResourceTemplate,
-  CompatibilityCallToolResultSchema,
-  GetPromptResultSchema
+  Tool
 } from "@modelcontextprotocol/sdk/types.js";
-import { createClients, ConnectedClient } from './client.js';
-import { Config, loadConfig } from './config.js';
-import { z } from 'zod';
 import * as eventsource from 'eventsource';
+import { z } from 'zod';
+import { ConnectedClient, createClients } from './client.js';
+import { loadConfig } from './config.js';
 
 global.EventSource = eventsource.EventSource
 
@@ -67,7 +67,12 @@ export const createServer = async () => {
         );
 
         if (result.tools) {
-          const toolsWithSource = result.tools.map(tool => {
+          // Filter tools based on allowedTools directly from the connectedClient
+          const filteredTools = connectedClient.allowedTools 
+            ? result.tools.filter(tool => connectedClient.allowedTools!.includes(tool.name))
+            : result.tools;
+
+          const toolsWithSource = filteredTools.map(tool => {
             toolToClientMap.set(tool.name, connectedClient);
             return {
               ...tool,

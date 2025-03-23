@@ -22,7 +22,8 @@
       "transport": {
         "type": "sse",
         "url": "http://example.com/mcp"
-      }
+      },
+      "allowedTools": ["tool1", "tool2"]
     }
   ]
 }

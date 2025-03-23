@@ -1,11 +1,17 @@
-# MCP Proxy Server
+# MCP Proxy Server - Cursor specific fork
 
-An MCP proxy server that aggregates and serves multiple MCP resource servers through a single interface. This server acts as a central hub that can:
+A Model Context Protocol (MCP) proxy server that solves two key limitations in Cursor's MCP implementation:
+1. The 40-tool limit per server
+2. Suboptimal environment variable management
+
+This is done with a solution that can:
 
 - Connect to and manage multiple MCP resource servers
 - Expose their combined capabilities through a unified interface
 - Handle routing of requests to appropriate backend servers
 - Aggregate responses from multiple sources
+- Filter tools based on allowedTools
+- Degrade with visibility into required environment variables
 
 ## Features
 
@@ -41,7 +47,8 @@ Example config structure:
       "name": "Server 1",
       "transport": {
         "command": "/path/to/server1/build/index.js"
-      }
+      },
+      "allowedTools": ["tool1", "tool2"]
     },
     {
       "name": "Server 2",
@@ -56,7 +63,7 @@ Example config structure:
       "transport": {
         "type": "sse",
         "url": "http://localhost:8080/sse"
-      }
+      },
     }
   ]
 }
@@ -142,7 +149,7 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 The following environment variables can be configured:
 
 - `KEEP_SERVER_OPEN`: When set to "1", keeps the SSE server running even if a client disconnects
-- `MCP_CLIENT_RETRIES`: Controls the number of retry attempts when connecting to MCP servers (default: 3)
+- `CLIENT_CONNECT_RETRIES`: Controls the number of retry attempts when connecting to MCP servers (default: 3)
 - `CLIENT_CONFIG_DIRECTORY`: Specifies the directory containing configuration files and environment variables
 
 ### Debugging

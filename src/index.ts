@@ -18,12 +18,20 @@ async function main() {
 
   await server.connect(transport);
 
-  // Cleanup on exit
-  process.on("SIGINT", async () => {
+  const handleExit = async () => {
     await cleanup();
+    await transport.close();
     await server.close();
     process.exit(0);
-  });
+  };
+
+  // Cleanup on exit
+  process.on("SIGINT", handleExit);
+  process.on("SIGTERM", handleExit);
+
+  process.stdin.resume();
+  process.stdin.on("end", handleExit);
+  process.stdin.on("close", handleExit);
 }
 
 main().catch((error) => {
