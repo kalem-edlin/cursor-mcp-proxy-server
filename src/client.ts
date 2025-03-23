@@ -3,17 +3,47 @@ import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import { ServerConfig } from './config.js';
+import { DegradedClient } from './degraded-client.js';
+
+const noopTransport: Transport = {
+  start() { return Promise.resolve() },
+  send() { return Promise.resolve() },
+  close() { return Promise.resolve() },
+  onmessage() { },
+  onclose() { },
+  onerror() { }
+}
 
 const sleep = (time: number) => new Promise<void>(resolve => setTimeout(() => resolve(), time))
+
 export interface ConnectedClient {
   client: Client;
   cleanup: () => Promise<void>;
   name: string;
+  allowedTools?: string[]; // Optional list of allowed tool names for this clien
 }
 
 const createClient = (server: ServerConfig): { client: Client | undefined, transport: Transport | undefined } => {
+  if (!server.transport) {
+    console.error(`Missing transport configuration for server: ${server.name}`);
+    return { client: undefined, transport: undefined };
+  }
 
+<<<<<<< HEAD
   let transport: Transport | null = null
+=======
+  // Check for missing env variables and create a degraded client if any are missing - to inform the MCP user that the potential server is degraded
+  if (server.transport.type !== 'sse' && server.transport.env) {
+    const missingEnvVars = server.transport.env.filter(v => !process.env[v]);
+    if (missingEnvVars.length > 0) {
+      console.warn(`Server ${server.name} is missing required env variables: ${missingEnvVars.join(', ')}`);
+      const degradedClient = new DegradedClient(server, missingEnvVars);
+      return { client: degradedClient, transport: noopTransport };
+    }
+  }
+
+  let transport: Transport | null = null;
+>>>>>>> update
   try {
     if (server.transport.type === 'sse') {
       transport = new SSEClientTransport(new URL(server.transport.url));
@@ -56,7 +86,11 @@ export const createClients = async (servers: ServerConfig[]): Promise<ConnectedC
     console.log(`Connecting to server: ${server.name}`);
 
     const waitFor = 2500
+<<<<<<< HEAD
     const retries = 3
+=======
+    const retries = process.env.CLIENT_CONNECT_RETRIES ? parseInt(process.env.CLIENT_CONNECT_RETRIES) : 3
+>>>>>>> update
     let count = 0
     let retry = true
 
@@ -69,11 +103,12 @@ export const createClients = async (servers: ServerConfig[]): Promise<ConnectedC
 
       try {
         await client.connect(transport);
-        console.log(`Connected to server: ${server.name}`);
+        console.log(`Connected to server: ${server.name}${server.allowedTools ? ` with scoped tools: ${server.allowedTools}` : ''}`);
 
         clients.push({
           client,
           name: server.name,
+          allowedTools: server.allowedTools,
           cleanup: async () => {
             await transport.close();
           }
